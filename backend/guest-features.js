@@ -1,4 +1,4 @@
-﻿const pool = require("./db");
+﻿// Load the legacy MySQL adapter only when running the local legacy backend.
 
 const firebaseKey = process.env.FIREBASE_WEB_API_KEY || "AIzaSyCzydINVn-Gio9P13K4vsYEBAljbiiRLeg";
 const project = process.env.FIREBASE_PROJECT_ID || "hotel-reservation-d7595";
@@ -62,6 +62,7 @@ const extraSelect = "SELECT id, name, description, price, unit, is_active AS act
 const units = new Set(["stay", "night", "guest", "item"]);
 
 async function initializeGuestFeatures() {
+  const pool = require("./db");
   await pool.query(`CREATE TABLE IF NOT EXISTS guest_directory_profiles (
     uid VARCHAR(128) PRIMARY KEY, email VARCHAR(160) NOT NULL UNIQUE, name VARCHAR(100) NOT NULL,
     photo MEDIUMTEXT NULL
@@ -120,6 +121,7 @@ async function priceExtras(conn, selections, nights, guests) {
 }
 
 function registerGuestFeatures(app, wrap) {
+  const pool = require("./db");
   async function listReviews(adminView) {
     const [legacy, stays] = await Promise.all([
       pool.query(`SELECT CONCAT('legacy-',uid) AS id, display_name AS name, hotel_rating AS hotelRating,

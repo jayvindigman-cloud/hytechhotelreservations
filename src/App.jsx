@@ -1,5 +1,5 @@
 import { API_BASE, accountFetch } from "./hotel-api";
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -18,6 +18,7 @@ export default function App() {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [authError, setAuthError] = useState('')
+  const signupReady = useRef(null)
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -32,6 +33,8 @@ export default function App() {
       }
 
       try {
+        // Firebase announces the new session before signup finishes saving its profile.
+        if (signupReady.current) await signupReady.current;
         const userRef = doc(db, 'users', firebaseUser.uid)
         const snapshot = await getDoc(userRef)
         let data
@@ -118,20 +121,27 @@ export default function App() {
 
   async function handleSignup({ name, email, password }) {
     setAuthError('')
-    const credential = await createUserWithEmailAndPassword(auth, email.trim(), password)
+    let finishSignup;
+    signupReady.current = new Promise((resolve) => { finishSignup = resolve; });
+    try {
+      const credential = await createUserWithEmailAndPassword(auth, email.trim(), password)
 
-    await updateProfile(credential.user, {
-      displayName: name.trim(),
-    })
+      await updateProfile(credential.user, {
+        displayName: name.trim(),
+      })
 
-    await setDoc(doc(db, 'users', credential.user.uid), {
-      uid: credential.user.uid,
-      name: name.trim(),
-      email: credential.user.email || email.trim(),
-      photoURL: credential.user.photoURL || '',
-      role: 'customer',
-      createdAt: serverTimestamp(),
-    })
+      await setDoc(doc(db, 'users', credential.user.uid), {
+        uid: credential.user.uid,
+        name: name.trim(),
+        email: credential.user.email || email.trim(),
+        photoURL: credential.user.photoURL || '',
+        role: 'customer',
+        createdAt: serverTimestamp(),
+      })
+    } finally {
+      finishSignup();
+      signupReady.current = null;
+    }
   }
 
   async function handleSaveProfile(value, photoURL) {

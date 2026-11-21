@@ -2,7 +2,7 @@ import { roomDescriptions } from "../data/hotelCatalog";
 import GuestAccount from "./GuestAccount";
 import GuestReviews from "./GuestReviews";
 import { API_BASE, accountFetch, extraUnits, hotelToday, readJson } from "../hotel-api";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import LoginModal from "./LoginModal";
 import RoomDetails from "./RoomDetails";
 
@@ -388,7 +388,7 @@ function FoodOrder({ cart, setCart, menu, addToCart, user, onClose, notice, refr
       setCart({});
     } catch (err) {
       console.error(err);
-      setError("Cannot reach the server. Make sure the backend is running on port 8080.");
+      setError("The food order could not be sent. Please try again shortly.");
     } finally {
       setSubmitting(false);
     }
@@ -645,6 +645,8 @@ export default function HotelInfo({ user, onLogin, onGoogleLogin, onSignup, auth
   const [selectedExtras, setSelectedExtras] = useState({});
   const [extrasError, setExtrasError] = useState("");
   const [submittingBooking, setSubmittingBooking] = useState(false);
+  const bookingRequestKey = useRef(null);
+  const bookingInFlight = useRef(false);
   const [voucherInput, setVoucherInput] = useState("");
   const [voucher, setVoucher] = useState(null);
   const [voucherMsg, setVoucherMsg] = useState("");
@@ -833,6 +835,7 @@ export default function HotelInfo({ user, onLogin, onGoogleLogin, onSignup, auth
   };
 
   const openBookingForm = (roomName, checkIn = "", guests = 1) => {
+    bookingRequestKey.current = crypto.randomUUID();
     setFormData({
       ...emptyForm,
       guestName: user?.displayName || user?.name || "",
@@ -914,12 +917,13 @@ export default function HotelInfo({ user, onLogin, onGoogleLogin, onSignup, auth
       setBookingStep((step) => step + 1);
       return;
     }
-    if (!datesValid || submittingBooking) return;
+    if (!datesValid || bookingInFlight.current) return;
+    bookingInFlight.current = true;
     setSubmittingBooking(true);
     try {
       const response = await accountFetch(`${API}/reservations`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Idempotency-Key": bookingRequestKey.current },
         body: JSON.stringify({
           guestName: formData.guestName,
           email: formData.email,
@@ -940,19 +944,15 @@ export default function HotelInfo({ user, onLogin, onGoogleLogin, onSignup, auth
         }),
       });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        setBookingError(result.message || "The reservation could not be saved.");
-        return;
-      }
+      const result = await readJson(response);
 
       setBookingReceipt(result.reservation);
       setBookingReceipts(result.reservations || [result.reservation]);
     } catch (error) {
       console.error("Error submitting reservation:", error);
-      setBookingError("The reservation server is unavailable. Please try again.");
+      setBookingError(error.message || "The reservation could not be saved. Please try again.");
     } finally {
+      bookingInFlight.current = false;
       setSubmittingBooking(false);
     }
   };
@@ -1579,7 +1579,7 @@ export default function HotelInfo({ user, onLogin, onGoogleLogin, onSignup, auth
                   <div style={{ fontSize: "0.9rem", lineHeight: "1.8", color: "#333" }}>
                     <div style={receiptRowStyle}>
                       <span><strong>Booking Reference:</strong></span>
-                      <span style={{ color: "#9a7430", fontWeight: "bold" }}>{bookingReceipt.id}</span>
+                      <span style={{ color: "#9a7430", fontWeight: "bold" }}>{bookingReceipt.code || bookingReceipt.id}</span>
                     </div>
                     {receiptRows.map(([label, value]) => (
                       <div key={label} style={receiptRowStyle}>
@@ -1613,7 +1613,7 @@ export default function HotelInfo({ user, onLogin, onGoogleLogin, onSignup, auth
                     marginTop: "15px",
                   }}
                 >
-                  Thank you for booking with HYTECH HOTEL AND BISTRO! Keep this receipt. You can open it again anytime from Profile, and we will text you when the hotel confirms.
+                  Your reservation request is saved. Keep your booking reference and check Profile for the hotel’s confirmation. Verify your account email to view saved reservations.
                 </p>
 
                 <button
@@ -1727,7 +1727,7 @@ export default function HotelInfo({ user, onLogin, onGoogleLogin, onSignup, auth
                         placeholder="09XX XXX XXXX"
                         required
                         pattern="^(\+?63|0)9[\d\s\-]{9,12}$"
-                        title="Enter a mobile number like 0917 123 4567. We text your booking updates to this number."
+                        title="Enter a mobile number like 0917 123 4567 so the hotel can contact you."
                         value={formData.phone}
                         onChange={handleInputChange}
                       />

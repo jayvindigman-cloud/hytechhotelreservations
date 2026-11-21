@@ -1,7 +1,7 @@
 import { sendPasswordResetEmail } from "firebase/auth";
-﻿import { auth } from "./Firebase";
+import { auth } from "./Firebase";
 
-export const API_BASE = import.meta.env.VITE_API_BASE_URL?.trim().replace(/\/+$/, "") || "/api";
+export const API_BASE = "/api";
 
 export async function accountFetch(url, options = {}) {
   const token = await auth.currentUser?.getIdToken();
