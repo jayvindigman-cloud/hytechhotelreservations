@@ -1,0 +1,58 @@
+[
+  {
+    "title": "Filipino Buffet Breakfast",
+    "category": "Breakfast",
+    "price": "₱350 / head",
+    "image": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=800&q=80",
+    "desc": "Traditional garlic rice, eggs, local longganisa, savory cured beef tapa, and seasonal fresh fruits."
+  },
+  {
+    "title": "Fresh Seafood Platter",
+    "category": "Seafood",
+    "price": "₱850 / platter",
+    "image": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80",
+    "desc": "Local coastal catch featuring grilled prawns, tender squid, and buttered crabs."
+  },
+  {
+    "title": "Artisanal Coffee & Pastries",
+    "category": "Coffee",
+    "price": "₱180+",
+    "image": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80",
+    "desc": "Freshly brewed highland coffee served alongside premium homemade baked goods."
+  },
+  {
+    "title": "Tropical Cocktails & Drinks",
+    "category": "Drinks",
+    "price": "₱220+",
+    "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=800&q=80",
+    "desc": "Refreshing fruit smoothies, fresh coconut water, and signature tropical cocktails."
+  },
+  {
+    "title": "Iced Caramel Latte",
+    "category": "Coffee",
+    "price": "₱160",
+    "image": "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=800&q=80",
+    "desc": "Chilled espresso with milk and house caramel, served over ice for a cool afternoon break."
+  },
+  {
+    "title": "Sunset Mojito",
+    "category": "Drinks",
+    "price": "₱240",
+    "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=800&q=80",
+    "desc": "Fresh mint, lime, and soda with a hint of local calamansi, best enjoyed on the rooftop deck."
+  },
+  {
+    "title": "Grilled Squid & Rice",
+    "category": "Seafood",
+    "price": "₱320",
+    "image": "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=800&q=80",
+    "desc": "Charcoal-grilled squid with garlic rice, atchara, and a tangy dipping sauce."
+  },
+  {
+    "title": "Tapsilog Morning Set",
+    "category": "Breakfast",
+    "price": "₱180",
+    "image": "https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?auto=format&fit=crop&w=800&q=80",
+    "desc": "Tender beef tapa, garlic rice, and sunny-side-up egg served with hot coffee."
+  }
+]
