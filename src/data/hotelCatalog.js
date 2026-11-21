@@ -100,4 +100,4 @@ export const roomDescriptions = [
     },
   ];
 
-export { default as foodItems } from "./menu.json";
+export { default as foodItems } from "./menu.json" with { type: "json" };
